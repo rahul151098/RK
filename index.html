@@ -125,6 +125,8 @@ input{background:#ffffff14;border:1px solid #ffffff44;color:var(--ink);padding:1
    FIXED_NAME: type a name to skip the first page. Leave "" to ask.
    ===================================================================== */
 const FIXED_NAME = "R";
+const MUSIC = "music/song.mp3";
+const MUSIC_VOLUME = 0.6;
 const MSG = {
   /* page 1: asking the name */
   askTop: "a little something, for you",
@@ -345,6 +347,13 @@ const PHONE=!!document.querySelector(".ph");
 (function loop(t){if(PHONE)return;bx.clearRect(0,0,W,H);for(const s of stars){s.y-=s.s;if(s.y<0)s.y=H;bx.globalAlpha=.4+.6*Math.abs(Math.sin(t/900+s.p));bx.fillStyle="#fff4e0";bx.beginPath();bx.arc(s.x,s.y,s.r,0,6.28);bx.fill()}
   fc.clearRect(0,0,W,H);for(const b of bits){b.vy+=.28;b.vx*=.985;b.x+=b.vx;b.y+=b.vy;b.r+=b.vr;b.l-=b.d||.006;if(b.rk){bits.push({x:b.x,y:b.y,vx:0,vy:0,s:1.6,c:"#ffe9a8",l:.4,d:.04,r:0,vr:0});if(b.vy>-1.2){b.l=0;boom(b.x,b.y)}}fc.save();fc.globalAlpha=Math.max(b.l,0);fc.translate(b.x,b.y);fc.rotate(b.r);fc.fillStyle=b.c;if(b.s){fc.beginPath();fc.arc(0,0,b.s,0,6.28);fc.fill()}else fc.fillRect(-b.w/2,-b.h/2,b.w,b.h);fc.restore()}
   bits=bits.filter(b=>b.l>0&&b.y<H+30);requestAnimationFrame(loop)})(0);
+if(MUSIC&&!(typeof PHONE!=="undefined"&&PHONE)){
+  const au=document.createElement("audio");au.src=MUSIC;au.loop=true;au.volume=MUSIC_VOLUME;au.preload="auto";document.body.appendChild(au);
+  let started=false;
+  const go=()=>{if(started)return;au.play().then(()=>{started=true;removeEventListener("pointerdown",go);removeEventListener("keydown",go)}).catch(()=>{})};
+  addEventListener("pointerdown",go);addEventListener("keydown",go);
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)au.pause();else if(started)au.play().catch(()=>{})});
+}
 if(!PHONE)scenes[FIXED_NAME?1:0]();
 </script>
 </body>
